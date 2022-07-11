@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccunix.coffee.dao.CoffeeOrdersDao">
+    <resultMap id="coffeeOrdersResultMap" type="org.ccunix.coffee.domain.CoffeeOrdersResultMap" autoMapping="true">
+        <id column="id" property="id"></id>
+        <result column="status" property="status"></result>
+        
+        <association property="coffeeAddress" javaType="org.ccunix.coffee.domain.CoffeeAddress" autoMapping="true">
+            <id column="address_id" property="id"></id>
+            <result column="linkman" property="linkman"></result>
+            <result column="phone" property="phone"></result>
+            <result column="addressname" property="addressname"></result>
+        </association>
+        <association property="coffeeUser" javaType="org.ccunix.coffee.domain.CoffeeUser" autoMapping="true">
+            <id column="user_id" property="id"></id>
+            <result column="userName" property="name"></result>
+        </association>
+        
+    </resultMap>
+    <select id="selectAllOrdersByPage" parameterType="org.ccunix.coffee.vo.OrdersCustomVO"
+            resultMap="coffeeOrdersResultMap">
+        select o.id,o.status,a.id address_id,a.linkman linkman,a.phone,a.addressname,
+        u.id user_id,u.name userName
+        from orders o left join address a on o.address_id = a.id
+        left join user u on o.user_id = u.id
+        where 1=1
+        <if test="phone!=null and phone.trim()!=''">
+            and a.phone like "%"#{phone}"%"
+        </if>
+        <if test="linkman!=null and linkman.trim()!=''">
+            and a.linkman like "%"#{linkman}"%"
+        </if>
+        <if test="userName!=null and userName.trim()!=''">
+            and u.name like "%"#{userName}"%"
+        </if>
+        <if test="status!=null and status.trim()!=''">
+            and o.status=#{status}
+        </if>
+    </select>
+
+    <update id="toDeliver">
+        update orders set  status='已发货' where id=#{id}
+    </update>
+    <!--多对多的resultMap配置-->
+    <resultMap id="coffeeOrdersResultMap2" type="org.ccunix.coffee.domain.CoffeeOrdersResultMap" autoMapping="true">
+        <id column="id" property="id"></id>
+        <result column="status" property="status"></result>
+        <!--一个地址-->
+        <association property="coffeeAddress" javaType="org.ccunix.coffee.domain.CoffeeAddress" autoMapping="true">
+            <id column="address_id" property="id"></id>
+            <result column="linkman" property="linkman"></result>
+            <result column="phone" property="phone"></result>
+            <result column="addressname" property="addressname"></result>
+        </association>
+        <!--一个会员-->
+        <association property="coffeeUser" javaType="org.ccunix.coffee.domain.CoffeeUser" autoMapping="true">
+            <id column="user_id" property="id"></id>
+            <result column="userName" property="name"></result>
+        </association>
+        <!--n个详单集合-->
+        <collection property="ordersDetailList" ofType="org.ccunix.coffee.domain.CoffeeOrdersDetailResultMap" autoMapping="true">
+            <id column="orderdetail_id" property="id"></id>
+            <result column="num" property="num"></result>
+            <!--一个咖啡对象-->
+            <association property="coffee" javaType="org.ccunix.coffee.domain.Coffee" autoMapping="true">
+                <id column="coffee_id" property="id"></id>
+                <result column="picture" property="picture"></result>
+                <result column="coffeeName" property="name"></result>
+            </association>
+        </collection>
+
+    </resultMap>
+
+    <select id="selectOrdersDetailListById" resultMap="coffeeOrdersResultMap2">
+        select o.id,o.status,a.id address_id,a.linkman linkman,a.phone,a.addressname,
+        u.id user_id,u.name userName,
+        od.id orderdetail_id,od.num ,od.coffee_id,
+        coffee.picture,coffee.name coffeeName
+        from orders o left join address a on o.address_id = a.id
+        left join user u on o.user_id = u.id
+        left join orderdetail od on o.id = od.orders_id,
+        coffee
+        where 1=1 and o.id =#{id} and od.coffee_id = coffee.id
+    </select>
+</mapper>

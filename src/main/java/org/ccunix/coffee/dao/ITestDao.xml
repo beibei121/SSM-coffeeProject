@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccunix.coffee.dao.ITestDao">
+<select id="queryAll" resultType="org.ccunix.coffee.domain.TestAccount">
+        select id,name,money from account
+    </select>
+
+<insert id="saveAccount" parameterType="org.ccunix.coffee.domain.TestAccount">
+        insert into account(name,money) values(#{name},#{money})
+    </insert>
+</mapper>

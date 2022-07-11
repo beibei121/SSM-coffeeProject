@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccunix.coffee.dao.CoffeeCommentsDao">
+    <resultMap id="coffeeCommentsResultMap" type="org.ccunix.coffee.domain.CoffeeCommentsResultMap">
+        <id column="id" property="id"></id>
+        <result column="content" property="content"></result>
+        <result column="addtime" property="addtime"></result>
+        <association property="coffeeUser" javaType="org.ccunix.coffee.domain.CoffeeUser" autoMapping="true">
+            <id column="user_id" property="id"></id>
+            <result column="userName" property="name"></result>
+        </association>
+        <association property="coffee" javaType="org.ccunix.coffee.domain.Coffee" autoMapping="true">
+            <id column="coffee_id" property="id"></id>
+            <result column="coffeeName" property="name"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectAllCommentsByPage" parameterType="org.ccunix.coffee.vo.CommentsCustomVO"
+            resultMap="coffeeCommentsResultMap">
+        SELECT
+        cs.id,cs.content,DATE_FORMAT(cs.addtime,'%Y-%m-%d %H:%i:%s')addtime,cs.isDelete,
+        u.id user_id,u.name userName,
+        c.id coffee_id,c.name coffeeName
+        from comments cs LEFT JOIN user u on cs.user_id = u.id
+        LEFT JOIN coffee c on cs.coffee_id = c.id
+        where 1=1 and cs.isDelete=0
+        <if test="userName!=null and userName.trim()!=''">
+            and u.name like "%"#{userName}"%"
+        </if>
+        <if test="coffeeName!=null and coffeeName.trim()!=''">
+            and c.name like "%"#{coffeeName}"%"
+        </if>
+        <if test="content!=null and content.trim()!=''">
+            and cs.content like "%"#{content}"%"
+        </if>
+        <if test="startTime!=null and startTime.trim()!=''">
+            and cs.addtime<![CDATA[>=]]>str_to_date(#{startTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endsTime!=null and endsTime.trim()!=''">
+            and cs.addtime<![CDATA[<=]]>str_to_date(#{endsTime},'%Y-%m-%d %H:%i:%s')
+        </if>
+    </select>
+
+    <select id="selectAllCommentsById" resultMap="coffeeCommentsResultMap">
+        SELECT
+        cs.id,cs.content,DATE_FORMAT(cs.addtime,'%Y-%m-%d %H:%i:%s')addtime,cs.isDelete,
+        u.id user_id,u.name userName,
+        c.id coffee_id,c.name coffeeName
+        from comments cs LEFT JOIN user u on cs.user_id = u.id
+        LEFT JOIN coffee c on cs.coffee_id = c.id
+        where 1=1 and cs.isDelete=0 and cs.id = #{id}
+    </select>
+
+    <delete id="deleteCommentsById" >
+        update comments set isDelete = 1 where id=#{id}
+    </delete>
+
+</mapper>

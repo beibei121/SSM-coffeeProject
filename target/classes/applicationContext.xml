@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--开启注解扫描  该spring配置文件只处理service和dao，controller不需要spring框架去处理-->
+    <context:component-scan base-package="org.ccunix.coffee">
+        <!--配置哪些注解不扫描-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--spring整合Mybatis框架-->
+    <!--配置连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql:///admaincoffee"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="root"></property>
+    </bean>
+    <!--配置SqlSessionFactory工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!-- 也可以直接加载你要加载的文件  不通过mybatis-config.xml作为中间过渡  注释的方法可以扫描该包下面的所有xml文件 -->
+        <property name="mapperLocations" value="classpath:org/ccunix/coffee/dao/*.xml"></property>
+    </bean>
+    <!--配置扫描的包   AccountDao接口所在包  注入到容器中 -->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="org.ccunix.coffee.dao"></property>
+    </bean>
+
+
+    <!--事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+<!--    <bean id="adminSerivice" class="org.ccunix.coffee.service.impl.AdminServiceImpl">-->
+<!--    </bean>-->
+    <!--配置事务通知消息类型-->
+    <tx:advice id="txManager" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!-- 增删改需要的内容-->
+            <tx:method name="*" propagation="REQUIRED" read-only="false"/>
+            <tx:method name="find*" propagation="SUPPORTS" read-only="true"></tx:method>
+            <tx:method name="select*" propagation="SUPPORTS" read-only="true"></tx:method>
+            <tx:method name="query*" propagation="SUPPORTS" read-only="true"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="pt1" expression="execution(* org.ccunix.coffee.service.impl.*.*(..))"/>
+        <aop:advisor advice-ref="txManager" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+
+</beans>

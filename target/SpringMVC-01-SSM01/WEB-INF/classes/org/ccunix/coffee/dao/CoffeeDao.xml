@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccunix.coffee.dao.CoffeeDao">
+    <!-- 推荐使用的: 将来可以使用延迟加载 -->
+    <resultMap id="coffeeResultMap" type="org.ccunix.coffee.domain.CoffeeResultMap" autoMapping="true">
+        <id column="id" property="id"></id>
+        <result column="picture" property="picture"></result>
+        <result column="name" property="name"></result>
+        <result column="price" property="price"></result>
+        <result column="num" property="num"></result>
+        <result column="netweight" property="netweight"></result>
+        <result column="qualitydate" property="qualitydate"></result>
+        <result column="brand" property="brand"></result>
+        <result column="storage" property="storage"></result>
+        <result column="detail" property="detail"></result>
+        <!-- 一个咖啡类型对象 -->
+        <association property="coffeetype" javaType="org.ccunix.coffee.domain.Coffeetype" autoMapping="true">
+            <id property="id" column="coffeetype_id"></id>
+            <result property="name" column="coffeetypeName"></result>
+        </association>
+        <!-- 一个咖啡口味对象 -->
+        <association property="coffeeTaste" javaType="org.ccunix.coffee.domain.CoffeeTaste" autoMapping="true">
+            <id property="id" column="taste_id"></id>
+            <result property="name" column="tasteName"></result>
+        </association>
+    </resultMap>
+    <!---->
+    <select id="selectAllCoffeeResultMap"  parameterType="org.ccunix.coffee.pojo.CoffeePOJO"
+    resultMap="coffeeResultMap">
+            select c.id,c.picture,c.name,c.price,c.num,
+            c.netweight,c.qualitydate,c.brand,c.storage,c.detail,
+            ct.id coffeetype_id,
+            t.id taste_id,
+            ct.name coffeetypeName,
+            t.name tasteName
+            from coffee c left join coffeetype ct on c.coffeetype_id=ct.id
+            left join taste t on c.taste_id=t.id
+            where 1=1
+            <if test="name!=null and name.trim()!=''">
+                and c.name like "%"#{name}"%"
+            </if>
+            <if test="coffeetypeId != null and coffeetypeId != 0">
+                and ct.id = #{coffeetypeId}
+            </if>
+            <if test="tasteId != null and tasteId != 0">
+            and t.id = #{tasteId}
+            </if>
+    </select>
+<!--     传统实现  最简单 最直接的方式 只要把扩展的字段写在类型中  就可以实现对数据的封装 -->
+    <select id="selectAllCoffee"  parameterType="org.ccunix.coffee.pojo.CoffeePOJO"
+            resultType="org.ccunix.coffee.domain.Coffee">
+        select c.id,c.picture,c.name,c.price,c.num,c.coffeetype_id,c.taste_id
+        c.netweight,c.qualitydate,c.brand,c.storage,c.detail,
+        ct.name coffeetypeName,
+        t.name tasteName
+        from coffee c left join coffeetype ct on c.coffeetype_id=ct.id
+         left join taste t on c.taste_id=t.id
+        where 1=1
+        <if test="name!=null and name.trim()!=''">
+            and c.name like "%"#{name}"%"
+        </if>
+        <if test="coffeetypeId != null and coffeetypeId.trim() != ''">
+            and ct.id = #{coffeetypeId}
+        </if>
+        <if test="tasteId != null and tasteId.trim() != ''">
+            and t.id = #{tasteId}
+        </if>
+    </select>
+
+    <!-- 添加咖啡 -->
+    <insert id="addCoffee" parameterType="org.ccunix.coffee.pojo.CoffeePOJO">
+        insert into coffee (picture,name,price,num,netweight,qualitydate,brand
+                            ,storage,detail,coffeetype_id,taste_id)
+        values (#{picture},#{name},#{price},#{num},#{netweight},#{qualitydate},#{brand}
+                            ,#{storage},#{detail},#{coffeetypeId},#{tasteId})
+
+    </insert>
+    
+    <select id="selectCoffeeById" resultMap="coffeeResultMap" >
+        select c.id,c.picture,c.name,c.price,c.num,
+        c.netweight,c.qualitydate,c.brand,c.storage,c.detail,
+        ct.id coffeetype_id,
+        t.id taste_id,
+        ct.name coffeetypeName,
+        t.name tasteName
+        from coffee c left join coffeetype ct on c.coffeetype_id=ct.id
+        left join taste t on c.taste_id=t.id
+        where 1=1 and c.id=#{id}
+    </select>
+
+    <update id="updateCoffee" parameterType="org.ccunix.coffee.pojo.CoffeePOJO">
+        update coffee set picture=#{picture},name=#{name},price=#{price},num=#{num},
+                          netweight=#{netweight},qualitydate=#{qualitydate},brand=#{brand},
+                          storage=#{storage},detail=#{detail},coffeetype_id=#{coffeetypeId},
+                          taste_id=#{tasteId}
+        where id=#{id}
+    </update>
+
+    <delete id="deleteCoffee">
+        delete from coffee where id=#{id}
+    </delete>
+    
+</mapper>

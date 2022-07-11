@@ -1,0 +1,65 @@
+html,body{height: 100%;}
+body{
+    background: #9CDCF8;
+    font-family: "微软雅黑";
+    color: #69696d;
+}
+#div1{
+    width: 45%;
+    position: relative;
+    top:50%;
+    margin-top:-80px;
+}
+#div0{
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    border-radius: 10px;
+    padding: 50px 35px;
+    background-image: linear-gradient(to bottom, #c3e6f5 0%, #c3e6f5 63%, #62c0e8 63%, #c3e6f5 100%);
+}
+#div0 h1{font-size: 28px;margin: 0;}
+.main_div{
+    position: absolute;
+    bottom: 0;
+    right: 80px;
+    width: 50%;
+    padding: 30px 0 20px 0;
+    background: rgba(255,255,255,0.5);
+    border-radius: 10px;
+    border: 1px solid #62c0e8;
+}
+
+label{font-weight: 400;}
+button{
+    cursor: pointer;
+}
+#loginname{
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.bord_r{    height: 32px;
+    color: #fff;
+    text-shadow: 1px 1px 1px black;
+    background: rgba(0, 0, 0, 0.16);
+    border: 0;
+    border-radius: 5px !important;
+    outline: none;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.06);}
+
+.btn_div{padding: 0 70px;}
+
+#loginoption option{color: #373737;}
+
+#div1 input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{
+    color:#fff;
+}
+
+#div1 input:-moz-placeholder,textarea:-moz-placeholder{
+    color:#fff;
+}
+
+#div1 input::-moz-placeholder,textarea::-moz-placeholder{
+    color:#fff;
+}
+#div1 input:-ms-input-placeholder,textarea:-ms-input-placeholder{
+    color:#fff;
+}

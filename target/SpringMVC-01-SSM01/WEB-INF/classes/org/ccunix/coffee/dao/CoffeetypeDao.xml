@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.ccunix.coffee.dao.CoffeetypeDao">
+
+    <select id="selectAllCoffeetypeByPag" resultType="org.ccunix.coffee.domain.Coffeetype">
+        select id,name from coffeetype where 1=1
+        <if test="name!=null and name.trim()!=''">
+            and name like "%"#{name}"%"
+        </if>
+    </select>
+
+    <insert id="addCoffeetype" parameterType="org.ccunix.coffee.pojo.CoffeetypePOJO">
+        insert into coffeetype(name) values(#{name})
+    </insert>
+
+    <select id="selectAllCoffeetypeById" resultType="org.ccunix.coffee.domain.Coffeetype">
+        select id,name from coffeetype where id = #{id}
+    </select>
+
+    <update id="updateCoffeetype" parameterType="org.ccunix.coffee.pojo.CoffeetypePOJO">
+        update coffeetype set name = #{name} where id = #{id}
+    </update>
+
+    <delete id="deleteCoffeetypeById" parameterType="org.ccunix.coffee.pojo.CoffeetypePOJO">
+        delete from coffeetype where id = #{id}
+    </delete>
+</mapper>
